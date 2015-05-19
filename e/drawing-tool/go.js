@@ -16,7 +16,7 @@ $(document).ready(function(){
                 "height":"50px"
             });
 
-            $(document.body).svg({
+            $('#canvas').svg({
                 onLoad:function(svg){
 
                     $(svg.root()).attr({
@@ -107,6 +107,7 @@ $(document).ready(function(){
                           parent: document.getElementById('viz'),
                           doc: scxmlDoc
                         });
+                        layout.fit();
 
                         //TODO: use documentToModel
                         scion.urlToModel("behaviour/canvas.xml", function(err,model){

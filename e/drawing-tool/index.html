@@ -25,12 +25,20 @@ head: |
     ellipse.selected, rect.selected {
       stroke-dasharray : 5,5;
     }
+    #canvas-container { overflow: hidden; }
+    #canvas { position: relative; height: 200px; }
+    #viz { height: 300px; }
   </style>
 example: true
 ---
 
-<div id="viz" style="position:absolute;width:50%;height:100%;"></div>
-<div id="toolbarDiv"></div>
+<div class="well" id="canvas-container">
+  <div id="canvas">
+    <div id="toolbarDiv"></div>
+  </div>
+</div>
+
+<div id="viz"></div>
 
 <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/1.2.4/es5-shim.min.js"></script>
