@@ -1,0 +1,5 @@
+title: "DESM By Example"
+defaults:
+  - scope: {path: ""}
+    values:
+      layout: "page"
