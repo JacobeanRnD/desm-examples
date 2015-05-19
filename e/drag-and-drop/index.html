@@ -1,0 +1,82 @@
+---
+title: Drag and Drop
+head: |
+  <link rel="stylesheet" href="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.css">
+  <link rel="stylesheet" href="style.css">
+---
+
+<div id="rect"></div>
+
+<textarea id="scxmlDoc" style="display:none;">
+  <scxml
+    xmlns="http://www.w3.org/2005/07/scxml"
+    version="1.0"
+    profile="ecmascript">
+
+    <datamodel>
+      <data id="firstEvent"/>
+      <data id="eventStamp"/>
+      <data id="rectNode"/>
+      <data id="rectX"/>
+      <data id="rectY"/>
+    </datamodel>
+
+    <state id="initial-default">
+      <transition event="init" target="idle">
+        <assign location="rectNode" expr="_event.data"/>
+        <assign location="rectX" expr="0"/>
+        <assign location="rectY" expr="0"/>
+      </transition>
+    </state>
+
+    <state id="idle">
+      <onentry>
+        <script>
+          $(rectNode).text('idle');
+        </script>
+      </onentry>
+
+      <transition event="mousedown" target="dragging">
+        <assign location="firstEvent" expr="_event.data"/>
+        <assign location="eventStamp" expr="_event.data"/>
+      </transition>
+    </state>
+
+    <state id="dragging">
+      <onentry>
+        <script>
+          $(rectNode).text('dragging');
+        </script>
+      </onentry>
+
+      <transition event="mouseup" target="idle"/>
+
+      <transition event="mousemove" target="dragging">
+        <script>
+          var dx = eventStamp.clientX - _event.data.clientX;
+          var dy = eventStamp.clientY - _event.data.clientY;
+
+          //note that rectNode, rectX and rectY are all exposed
+          //from the datamodel as local variables
+
+          rectNode.style.left = (rectX -= dx) + 'px';
+          rectNode.style.top = (rectY -= dy) + 'px';
+        </script>
+        <assign location="eventStamp" expr="_event.data"/>
+      </transition>
+    </state>
+
+  </scxml>
+</textarea>
+
+<div id="viz"></div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/async/0.9.0/async.js"></script>
+<script src="//cdn.rawgit.com/OpenKieler/klayjs/0.3.2/klay.js"></script>
+<script src="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.js"></script>
+<script src="http://jbeard4.github.io/SCION/builds/latest/scion.js"></script>
+<script src="app.js"></script>
