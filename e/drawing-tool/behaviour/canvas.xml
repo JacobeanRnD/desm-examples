@@ -385,11 +385,11 @@ In both:
 
                 <transition target="drawing_rect" event="mousemove" cond="In('rect_tool_selected')">
                     <assign location="tDelta" expr="computeTDelta(eventStamp,_event.data)"/>
-                    <assign location="nodeBeingDrawn" expr="svg.rect(_event.data.clientX,_event.data.clientY,1,1,{'fill':'red','stroke':'black'})"/>
+                    <assign location="nodeBeingDrawn" expr="svg.rect(_event.data.offsetX,_event.data.offsetY,1,1,{'fill':'red','stroke':'black'})"/>
                 </transition>
                 <transition target="drawing_ellipse" event="mousemove" cond="In('ellipse_tool_selected')">
                     <assign location="tDelta" expr="computeTDelta(eventStamp,_event.data)"/>
-                    <assign location="nodeBeingDrawn" expr="svg.ellipse(_event.data.clientX,_event.data.clientY,1,1,{'fill':'blue','stroke':'black'})"/>
+                    <assign location="nodeBeingDrawn" expr="svg.ellipse(_event.data.offsetX,_event.data.offsetY,1,1,{'fill':'blue','stroke':'black'})"/>
                 </transition>
 
             </state>

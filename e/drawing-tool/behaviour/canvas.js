@@ -1,7 +1,7 @@
 function computeTDelta(oldEvent,newEvent){
     //summary:computes the offset between two events; to be later used with this.translate
-    var dx = newEvent.clientX - oldEvent.clientX;
-    var dy = newEvent.clientY - oldEvent.clientY;
+    var dx = newEvent.offsetX - oldEvent.offsetX;
+    var dy = newEvent.offsetY - oldEvent.offsetY;
 
     return {'dx':dx,'dy':dy};
 }
@@ -12,10 +12,11 @@ function updateRect(node,tDelta){
 }
 
 function updateCircle(node,startPosition,currentPosition){
-    var dxByTwo = (currentPosition.clientX - startPosition.clientX)/2;
-    var dyByTwo = (currentPosition.clientY - startPosition.clientY)/2;
-    node.cx.baseVal.value = startPosition.clientX + dxByTwo;
-    node.cy.baseVal.value = startPosition.clientY + dyByTwo;
+    console.log(currentPosition.offsetY);
+    var dxByTwo = (currentPosition.offsetX - startPosition.offsetX)/2;
+    var dyByTwo = (currentPosition.offsetY - startPosition.offsetY)/2;
+    node.cx.baseVal.value = startPosition.offsetX + dxByTwo;
+    node.cy.baseVal.value = startPosition.offsetY + dyByTwo;
     node.rx.baseVal.value = dxByTwo;
     node.ry.baseVal.value = dyByTwo;
 }
@@ -87,7 +88,7 @@ function getAggregateCenterPoint(nodes){
 
 
 function  computeRDelta(oldEvent,newEvent,cachedCenterPoint){
-    return _computeRotationAngle(cachedCenterPoint,{x:oldEvent.clientX,y:oldEvent.clientY},{x:newEvent.clientX,y:newEvent.clientY});
+    return _computeRotationAngle(cachedCenterPoint,{x:oldEvent.offsetX,y:oldEvent.offsetY},{x:newEvent.offsetX,y:newEvent.offsetY});
 }
 
 function  _computeRotationAngle(cpt,pt1,pt2){
