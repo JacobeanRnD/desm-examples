@@ -7,6 +7,7 @@ var layout = new forceLayout.Layout({
   parent: document.getElementById('viz'),
   doc: scxmlDoc
 });
+layout.fit();
 
 
 scion.documentStringToModel(scxmlDocString, function(err, model) {

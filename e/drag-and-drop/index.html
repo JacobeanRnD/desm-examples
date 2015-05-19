@@ -3,10 +3,18 @@ title: Drag and Drop
 head: |
   <link rel="stylesheet" href="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.css">
   <link rel="stylesheet" href="style.css">
+  <style>
+    #canvas-container { overflow: hidden; }
+    #canvas { position: relative; height: 200px; }
+  </style>
 example: true
 ---
 
-<div id="rect"></div>
+<div class="well" id="canvas-container">
+  <div id="canvas">
+    <div id="rect"></div>
+  </div>
+</div>
 
 <textarea id="scxmlDoc" style="display:none;">
   <scxml
