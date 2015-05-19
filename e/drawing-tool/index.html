@@ -39,20 +39,36 @@ example: true
   </div>
 </div>
 
-<div id="viz"></div>
+<div role="tabpanel">
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#statechartTab" aria-controls="home" role="tab" data-toggle="tab">statechart</a></li>
+    <li role="presentation"><a href="#canvasXmlTab" aria-controls="profile" role="tab" data-toggle="tab">canvas.xml</a></li>
+    <li role="presentation"><a href="#canvasJsTab" aria-controls="messages" role="tab" data-toggle="tab">canvas.js</a></li>
+    <li role="presentation"><a href="#goJsTab" aria-controls="settings" role="tab" data-toggle="tab">go.js</a></li>
+  </ul>
 
-<h3>canvas.xml</h3>
-<pre><code id="canvasXmlPreview" class="xml"></code></pre>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="statechartTab">
+      <div id="viz"></div>
+    </div>
 
-<h3>canvas.js</h3>
-<pre><code id="canvasJsPreview" class="javascript"></code></pre>
+    <div role="tabpanel" class="tab-pane" id="canvasXmlTab">
+      <pre><code id="canvasXmlPreview" class="xml"></code></pre>
+    </div>
 
-<h3>go.js</h3>
-<pre><code id="goJsPreview" class="javascript"></code></pre>
+    <div role="tabpanel" class="tab-pane" id="canvasJsTab">
+      <pre><code id="canvasJsPreview" class="javascript"></code></pre>
+    </div>
 
+    <div role="tabpanel" class="tab-pane" id="goJsTab">
+      <pre><code id="goJsPreview" class="javascript"></code></pre>
+    </div>
+  </div>
+</div>
 
 
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/1.2.4/es5-shim.min.js"></script>
 <script src="//jbeard4.github.com/SCION/builds/latest/scion-min.js"></script>
 <script src="jquery.svg.js"></script>
