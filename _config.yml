@@ -1,4 +1,5 @@
 title: "DESM By Example"
+base_url: "/desm-examples"
 defaults:
   - scope: {path: ""}
     values:
