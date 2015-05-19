@@ -2,6 +2,7 @@
 title: Drag and Drop
 head: |
   <link rel="stylesheet" href="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
   <link rel="stylesheet" href="style.css">
   <style>
     #canvas-container { overflow: hidden; }
@@ -15,6 +16,10 @@ example: true
     <div id="rect"></div>
   </div>
 </div>
+
+<div id="viz"></div>
+
+<pre><code id="preview" class="xml"></code></pre>
 
 <textarea id="scxmlDoc" style="display:none;">
   <scxml
@@ -78,8 +83,6 @@ example: true
   </scxml>
 </textarea>
 
-<div id="viz"></div>
-
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
@@ -89,3 +92,9 @@ example: true
 <script src="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.js"></script>
 <script src="http://jbeard4.github.io/SCION/builds/latest/scion.js"></script>
 <script src="app.js"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/xml.min.js"></script>
+<script>
+  hljs.highlightBlock($('#preview').text($('#scxmlDoc').val())[0]);
+</script>
