@@ -19,7 +19,8 @@ example: true
 
 <div id="viz"></div>
 
-<pre><code id="preview" class="xml"></code></pre>
+<h3>State Chart</h3>
+<pre><code id="statechartPreview" class="xml"></code></pre>
 
 <textarea id="scxmlDoc" style="display:none;">
   <scxml
@@ -83,6 +84,9 @@ example: true
   </scxml>
 </textarea>
 
+<h3>app.js</h3>
+<pre><code id="appjsPreview" class="javascript"></code></pre>
+
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
@@ -95,6 +99,10 @@ example: true
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/xml.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/javascript.min.js"></script>
 <script>
-  hljs.highlightBlock($('#preview').text($('#scxmlDoc').val())[0]);
+  hljs.highlightBlock($('#statechartPreview').text($('#scxmlDoc').val())[0]);
+  $.ajax({url: 'app.js', dataType: 'text', success: function(appjs) {
+    hljs.highlightBlock($('#appjsPreview').text(appjs)[0]);
+  }});
 </script>
