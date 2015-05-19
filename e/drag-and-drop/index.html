@@ -17,10 +17,27 @@ example: true
   </div>
 </div>
 
-<div id="viz"></div>
+<div role="tabpanel">
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#statechartTab" aria-controls="home" role="tab" data-toggle="tab">statechart</a></li>
+    <li role="presentation"><a href="#scxmlTab" aria-controls="messages" role="tab" data-toggle="tab">scxml</a></li>
+    <li role="presentation"><a href="#appJsTab" aria-controls="settings" role="tab" data-toggle="tab">app.js</a></li>
+  </ul>
 
-<h3>State Chart</h3>
-<pre><code id="statechartPreview" class="xml"></code></pre>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="statechartTab">
+      <div id="viz"></div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="scxmlTab">
+      <pre><code id="scxmlPreview" class="xml"></code></pre>
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="appJsTab">
+      <pre><code id="appJsPreview" class="javascript"></code></pre>
+    </div>
+  </div>
+</div>
 
 <textarea id="scxmlDoc" style="display:none;">
   <scxml
@@ -84,11 +101,9 @@ example: true
   </scxml>
 </textarea>
 
-<h3>app.js</h3>
-<pre><code id="appjsPreview" class="javascript"></code></pre>
-
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-<script src="//code.jquery.com/jquery-1.8.3.js"></script>
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/async/0.9.0/async.js"></script>
@@ -101,8 +116,8 @@ example: true
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/xml.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/javascript.min.js"></script>
 <script>
-  hljs.highlightBlock($('#statechartPreview').text($('#scxmlDoc').val())[0]);
+  hljs.highlightBlock($('#scxmlPreview').text($('#scxmlDoc').val())[0]);
   $.ajax({url: 'app.js', dataType: 'text', success: function(appjs) {
-    hljs.highlightBlock($('#appjsPreview').text(appjs)[0]);
+    hljs.highlightBlock($('#appJsPreview').text(appjs)[0]);
   }});
 </script>
