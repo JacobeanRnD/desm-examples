@@ -1,10 +1,29 @@
----
-layout: page
----
-<script src="//code.jquery.com/jquery-1.9.1.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.js"></script>
-<script src="{{ site.base_url }}/examples.js"></script>
+<!doctype html>
+<meta charset="utf-8">
+<title>{{ page.title }} &middot; {{ site.title }}</title>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.css">
+<link rel="stylesheet" href="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+{{ page.head }}
 
-{{ content }}
+<body>
 
-<div id="tabPanel"></div>
+{% include navbar.html %}
+
+<div class="container" id="exampleContainer">
+  <h1>{{ page.title }}</h1>
+
+  <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/async/0.9.0/async.js"></script>
+  <script src="//cdn.rawgit.com/OpenKieler/klayjs/0.3.2/klay.js"></script>
+  <script src="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.js"></script>
+  <script src="{{ site.base_url }}/examples.js"></script>
+
+  {{ content }}
+</div>
+

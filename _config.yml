@@ -4,3 +4,7 @@ defaults:
   - scope: {path: ""}
     values:
       layout: "page"
+  - scope: {path: "e"}
+    values:
+      layout: "example"
+      example: true

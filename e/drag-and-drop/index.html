@@ -1,14 +1,11 @@
 ---
 title: Drag and Drop
 head: |
-  <link rel="stylesheet" href="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.css">
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
   <link rel="stylesheet" href="style.css">
   <style>
     #canvas-container { overflow: hidden; }
     #canvas { position: relative; height: 200px; }
   </style>
-example: true
 ---
 
 <p>
@@ -21,28 +18,6 @@ example: true
 <div class="well" id="canvas-container">
   <div id="canvas">
     <div id="rect"></div>
-  </div>
-</div>
-
-<div role="tabpanel">
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#statechartTab" aria-controls="home" role="tab" data-toggle="tab">statechart</a></li>
-    <li role="presentation"><a href="#scxmlTab" aria-controls="messages" role="tab" data-toggle="tab">scxml</a></li>
-    <li role="presentation"><a href="#appJsTab" aria-controls="settings" role="tab" data-toggle="tab">app.js</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="statechartTab">
-      <div id="viz"></div>
-    </div>
-
-    <div role="tabpanel" class="tab-pane" id="scxmlTab">
-      <pre><code id="scxmlPreview" class="xml"></code></pre>
-    </div>
-
-    <div role="tabpanel" class="tab-pane" id="appJsTab">
-      <pre><code id="appJsPreview" class="javascript"></code></pre>
-    </div>
   </div>
 </div>
 
@@ -108,23 +83,28 @@ example: true
   </scxml>
 </textarea>
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-<script src="//code.jquery.com/jquery-1.9.1.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/async/0.9.0/async.js"></script>
-<script src="//cdn.rawgit.com/OpenKieler/klayjs/0.3.2/klay.js"></script>
-<script src="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.js"></script>
-<script src="//jbeard4.github.io/SCION/builds/latest/scion.js"></script>
-<script src="app.js"></script>
-
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/xml.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/javascript.min.js"></script>
 <script>
+  E.tabPanel([
+    {
+      id: 'statechartTab',
+      label: "statechart",
+      content: '<div id="viz"></div>'
+    },
+    {
+      id: 'scxmlTab',
+      label: "circuit-breaker.scxml",
+      content: '<pre><code id="scxmlPreview" class="xml"></code></pre>'
+    },
+    {
+      id: 'appJsTab',
+      label: "app.js",
+      content: '<pre><code id="appJsPreview" class="javascript"></code></pre>'
+    }
+  ]);
   hljs.highlightBlock($('#scxmlPreview').text($('#scxmlDoc').val())[0]);
   $.ajax({url: 'app.js', dataType: 'text', success: function(appjs) {
     hljs.highlightBlock($('#appJsPreview').text(appjs)[0]);
   }});
 </script>
+<script src="//jbeard4.github.io/SCION/builds/latest/scion.js"></script>
+<script src="app.js"></script>

@@ -6,7 +6,7 @@ var E = window.E = {};
 E.tabPanel = function(items) {
   var $buttons = $('<ul class="nav nav-tabs" role="tablist">');
   var $bodies = $('<div class="tab-content">');
-  var $tabPanel = $('#tabPanel').attr('role', 'tabpanel');
+  var $tabPanel = $('<div role="tabpanel">');
   items.forEach(function(item, i) {
     var $button = $('<li role="presentation">');
     var $a = $('<a aria-controls="home" role="tab" data-toggle="tab">');
@@ -22,7 +22,7 @@ E.tabPanel = function(items) {
     $button.appendTo($buttons);
     $body.appendTo($bodies);
   });
-  $tabPanel.append($buttons, $bodies);
+  $tabPanel.append($buttons, $bodies).appendTo('#exampleContainer');
 };
 
 })();
