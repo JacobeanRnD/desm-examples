@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Docker container manager.
+ Models docker lifecycle behaviour.
+ Actions support saving snapshot to a database, and restoring snapshot from database on crash.
+ Datamodel:
+  image
+
+ Algorithm:
+  Script initialization: set up dockerode.
+  dockerode creates container from image
+  Make restarting manual for now.
+    Bonus: demonstrate how it could be automated.
+      Timeout. Maximum number of retries.
+ Testing strategy:
+  Dockerode mock.
+Test the following edge cases
+  - Event timeout on send to docker container
+  - Container crash and manual restart
+  - Container crash and automatic restart
+
+TODO: implement a docker machinepack
+-->
+<scxml xmlns="http://www.w3.org/2005/07/scxml" name="managing-director" datamodel="ecmascript" version="1.0">
+  <datamodel>
+    <data id="dockerImageName" expr="'helloworld.scxml'"/>
+    <data id="dockerHostname" expr="'10.10.60.164'"/>
+    <data id="dockerPort" expr="2375"/>
+    <data id="sandbox"/>    <!-- FIXME: not serializable. so what do we do about that? -->
+  </datamodel>
+  <script>
+    <!-- init docker -->
+    <!-- TODO: break this out. When we support saving SCXML as scripts -->
+    <![CDATA[
+      var request = require('request');
+      var fs = require('fs');
+      var Docker = require('dockerode');
+      //TODO: mock this
+      //best thing would be to load a script dynamically. but for now I think we need to inject the mock
+      function createSandbox(cb){
+        var sandbox = {};
+        var docker = new Docker({
+          host : dockerHostname,
+          port : dockerPort,
+          protocol: 'http'
+        });
+        var t0 = new Date();
+        docker.createContainer(
+          {
+            Image: dockerImageName,
+            Memory: 128000000,
+            RestartPolicy: 'always',
+            MaximumRetryCount: 10,
+            ReadonlyRootfs : true,
+            Tty : false
+          },
+          function (err, container) {
+            if(err) return cb(err);
+            console.log('Created container');
+            sandbox.container = container;
+            container.attach({stream: true, stdout: true, stderr: true}, function (err, stream) {
+              stream.pipe(process.stdout);
+            });
+            var t1 = new Date();
+            console.log('ms until created',t1 - t0);
+            container.start(function (err, data) {
+              if(err) return cb(err);
+              console.log('Started container');
+
+              sandbox.container = container;
+
+              var t2 = new Date();
+              console.log('ms until started',t2 - t1);
+              container.inspect(function(err, info){
+                if(err) return cb(err);
+                console.log('Container info',info);
+
+                sandbox.pid = info.State.Pid;
+                sandbox.ip = info.NetworkSettings.IPAddress;
+                sandbox.startedAt = new Date(info.State.StartedAt);
+                sandbox.id = container.id;
+                var t3 = new Date();
+                console.log('ms to inspect',t3 - t2);
+                function waitUntilReady(){
+                  console.log('Server not ready yet',sandbox.ip);
+                  var url = 'http://' + sandbox.ip + ':3000/start';
+                  request({
+                    url: url,
+                    method : 'POST'
+                  },function(err, res, body){
+                    console.log('err',err,body);
+                    if(err) return setTimeout(waitUntilReady,100);
+                    if(res.statusCode !== 200) return setTimeout(waitUntilReady,100);
+                    var t4 = new Date();
+                    console.log('ms until ready',t4 - t3);
+                    console.log('ms total to bring up new container',t4 - t0);
+                    return cb(null, sandbox, body);
+                  });
+                }
+                setTimeout(waitUntilReady,100);
+              });
+            });
+          }
+        );
+      }
+    ]]>
+  </script>
+  <state id="main">
+    <transition event="error.*">
+      <!-- log all uncaught errors -->
+      <log label="Uncaught error" expr="event"/>
+    </transition>
+    <state id="Initial">
+      <onentry>
+        <script>
+          var that = this;
+          createSandbox(function(err, sbox){
+            if(err){
+              console.log('error starting docker container',err, sbox);
+              return that.send({name : "error.docker.created", data : err})
+            }
+
+            sandbox = sbox;   //now we have the sandbox
+            console.log('started sandbox',sandbox.ip);
+            that.send({name : "docker.created", data : err})
+
+          });
+        </script>
+      </onentry>
+      <!-- Create container -->
+      <transition target="Created" event="docker.created"/>
+      <transition target="Failed-to-create" event="error.docker.created"/>
+    </state>
+
+    <state id="Failed-to-create"></state>
+
+    <parallel id="Created">
+
+      <state id="Lifecycle">
+        <onentry>
+          <script>
+            console.log('registering event listener');
+            sandbox.container.events({filter : { id : sandbox.id }},function(err, stream){
+              if(err) throw err;
+              console.log('opened event stream');
+              stream.on('data',function(event){
+                var dockerEvent = JSON.parse(event.toString());
+                console.log('Received docker event',dockerEvent );
+
+                this.send({name : 'docker.' + dockerEvent.status, data : dockerEvent});
+              }.bind(this));
+            }.bind(this));
+          </script>
+        </onentry>
+
+        <transition type="internal" event="docker.create"/>  <!-- ignore docker.create -->
+        <transition type="internal" event="docker.destroy" target="Destroyed"/>
+        <transition type="internal" event="docker.die" target="Crashed"/>
+        <transition type="internal" event="docker.kill" target="Killed"/>
+        <transition type="internal" event="docker.pause" target="Paused"/>
+        <transition type="internal" event="docker.restart" target="Running"/>
+        <transition type="internal" event="docker.start" target="Running"/>
+        <transition type="internal" event="docker.stop" target="Stopped"/>
+        <transition type="internal" event="docker.unpause" target="Running"/>
+
+        <initial>
+          <transition target="Alive"/>
+        </initial>
+
+        <state id="Crashed">
+          <transition target="Restarting" event="system.restart"/>
+        </state>
+
+        <state id="Killed">
+          <transition target="Restarting" event="system.restart"/>
+        </state>
+
+        <state id="Restarting">
+          <onentry>
+            <script>
+              sandbox.container.restart(function(err){
+                if(err) return this.send({"name":"error.docker.restart"});
+              }.bind(this));
+            </script>
+          </onentry>
+        </state>
+
+        <!-- TODO: we really want to start the container in a stopped state.
+              But due to current limitations in the docker container, he starts out as /started.
+              So we just go directly to Running
+              -->
+        <state id="Alive">
+          <initial>
+            <transition target="Running"/>
+          </initial>
+
+          <transition event="system.kill">
+            <script>
+              sandbox.container.kill(function(err){
+                console.log('container.kill response',err);
+                if(err) return this.send({"name":"error.docker.kill"});
+              }.bind(this));
+            </script>
+          </transition>
+
+
+          <state id="Stopped">
+            <transition event="system.start">
+              <script>
+                console.log('container.start request');
+                sandbox.container.start(function(err){
+                  console.log('container.start response',err);
+                  if(err) return this.send({"name":"error.docker.start"});
+                }.bind(this));
+              </script>
+            </transition>
+
+            <transition target="Started" event="error.docker.start"/>
+          </state>
+
+          <state id="Started">
+            <transition event="system.stop">
+              <script>
+                sandbox.container.stop(function(err){
+                  console.log('container.stop response',err);
+                  if(err) return this.send({"name":"error.docker.stop"});
+                }.bind(this));
+              </script>
+            </transition>
+
+            <state id="Running">
+              <!-- embedded circuit breaker logic to intercept events -->
+              <!-- TODO: this would be a perfect application of <invoke> -->
+              <transition event="system.event">
+                <log label="processing event" expr="_event"/>
+              </transition>
+
+              <transition event="system.pause" target="Running">
+                <script>
+                  sandbox.container.pause(function(err){
+                    console.log('container.pause response',err);
+                    if(err) return this.send({"name":"error.docker.pause"});
+                  }.bind(this));
+                </script>
+              </transition>
+            </state>
+
+            <state id="Paused">
+              <transition event="system.unpause">
+                <script>
+                  console.log('here1');
+                  sandbox.container.unpause(function(err){
+                    console.log('container.unpause response',err);
+                    if(err) return this.send({"name":"error.docker.unpause"});
+
+                  }.bind(this));
+                </script>
+              </transition>
+            </state>
+          </state>
+        </state>
+
+      </state>
+
+      <state id="Runtime-errors">
+        <state id="All-good">
+          <transition event="error.docker.destroy" target="Error-on-Destroyed"/>
+          <transition event="error.docker.die" target="Error-on-Crashed"/>
+          <transition event="error.docker.kill" target="Error-on-Killed"/>
+          <transition event="error.docker.pause" target="Error-on-Paused"/>
+          <transition event="error.docker.restart" target="Error-on-Restarting"/>
+          <transition event="error.docker.start" target="Error-on-Running"/>
+          <transition event="error.docker.stop" target="Error-on-Stopped"/>
+          <transition event="error.docker.unpause" target="Error-on-Unpause"/>
+        </state>
+
+        <state id="Error">
+          <state id="Error-on-Destroyed"/>
+          <state id="Error-on-Crashed"/>
+          <state id="Error-on-Killed"/>
+          <state id="Error-on-Paused"/>
+          <state id="Error-on-Restarting"/>
+          <state id="Error-on-Running"/>
+          <state id="Error-on-Stopped"/>
+          <state id="Error-on-Unpause"/>
+          <transition target="All-good" event="docker.*"/>
+        </state>
+      </state>
+    </parallel>
+
+
+    <final id="Destroyed"/>
+
+    <!-- TODO: implement maximum automated retry limit -->
+    <final id="Fubared"/>
+  </state>
+</scxml>

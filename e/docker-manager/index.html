@@ -1,0 +1,51 @@
+---
+title: Docker Container Manager
+head: |
+  <link rel="stylesheet" href="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+  <style>
+    #viz { height: 300px; }
+  </style>
+example: true
+---
+
+<div role="tabpanel">
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#statechartTab" aria-controls="home" role="tab" data-toggle="tab">statechart</a></li>
+    <li role="presentation"><a href="#scxmlTab" aria-controls="messages" role="tab" data-toggle="tab">managing-director.scxml</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="statechartTab">
+      <div id="viz"></div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="scxmlTab">
+      <pre><code id="scxmlPreview" class="xml"></code></pre>
+    </div>
+  </div>
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/async/0.9.0/async.js"></script>
+<script src="//cdn.rawgit.com/OpenKieler/klayjs/0.3.2/klay.js"></script>
+<script src="//rawgit.com/JacobeanRnD/SCHVIZ/master/dist/forceLayout.js"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/xml.min.js"></script>
+<script>
+  $.ajax({url: 'managing-director.scxml', dataType: 'text', success: function(src) {
+    hljs.highlightBlock($('#scxmlPreview').text(src)[0]);
+
+    var scxmlDoc = (new DOMParser()).parseFromString(src, "application/xml");
+    var layout = new forceLayout.Layout({
+      parent: document.getElementById('viz'),
+      doc: scxmlDoc
+    });
+    layout.fit();
+  }});
+</script>
