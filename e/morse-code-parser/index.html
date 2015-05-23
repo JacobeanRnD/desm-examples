@@ -34,7 +34,7 @@ head: |
       content: '<pre><code id="runShPreview" class="javascript"></code></pre>'
     }
   ]);
-  $.ajax({url: 'morse.scxml', dataType: 'text', success: function(src) {
+  E.get('morse.scxml', function(src) {
     hljs.highlightBlock($('#scxmlPreview').text(src)[0]);
 
     var scxmlDoc = (new DOMParser()).parseFromString(src, "application/xml");
@@ -43,11 +43,11 @@ head: |
       doc: scxmlDoc
     });
     layout.fit();
-  }});
-  $.ajax({url: 'main.js', dataType: 'text', success: function(mainjs) {
+  });
+  E.get('main.js', function(mainjs) {
     hljs.highlightBlock($('#mainJsPreview').text(mainjs)[0]);
-  }});
-  $.ajax({url: 'run.sh', dataType: 'text', success: function(runsh) {
+  });
+  E.get('run.sh', function(runsh) {
     hljs.highlightBlock($('#runShPreview').text(runsh)[0]);
-  }});
+  });
 </script>

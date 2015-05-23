@@ -72,13 +72,13 @@ head: |
       content: '<pre><code id="goJsPreview" class="javascript"></code></pre>'
     }
   ]);
-  $.ajax({url: 'behaviour/canvas.js', dataType: 'text', success: function(appjs) {
+  E.get('behaviour/canvas.js', function(appjs) {
     hljs.highlightBlock($('#canvasJsPreview').text(appjs)[0]);
-  }});
-  $.ajax({url: 'behaviour/canvas.xml', dataType: 'text', success: function(appjs) {
+  });
+  E.get('behaviour/canvas.xml', function(appjs) {
     hljs.highlightBlock($('#canvasXmlPreview').text(appjs)[0]);
-  }});
-  $.ajax({url: 'go.js', dataType: 'text', success: function(appjs) {
+  });
+  E.get('go.js', function(appjs) {
     hljs.highlightBlock($('#goJsPreview').text(appjs)[0]);
-  }});
+  });
 </script>

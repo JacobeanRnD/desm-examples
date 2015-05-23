@@ -25,4 +25,8 @@ E.tabPanel = function(items) {
   $tabPanel.append($buttons, $bodies).appendTo('#exampleContainer');
 };
 
+E.get = function(url, callback) {
+  $.ajax({url: url, dataType: 'text', success: callback});
+};
+
 })();

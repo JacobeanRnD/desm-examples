@@ -25,7 +25,7 @@ head: |
       content: '<pre><code id="scxmlPreview" class="xml"></code></pre>'
     }
   ]);
-  $.ajax({url: 'managing-director.scxml', dataType: 'text', success: function(src) {
+  E.get('managing-director.scxml', function(src) {
     hljs.highlightBlock($('#scxmlPreview').text(src)[0]);
 
     var scxmlDoc = (new DOMParser()).parseFromString(src, "application/xml");
@@ -34,5 +34,5 @@ head: |
       doc: scxmlDoc
     });
     layout.fit();
-  }});
+  });
 </script>
