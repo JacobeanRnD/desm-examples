@@ -10,9 +10,9 @@ E.tabPanel = function(items) {
   items.forEach(function(item, i) {
     var $button = $('<li role="presentation">');
     var $a = $('<a aria-controls="home" role="tab" data-toggle="tab">');
-    $a.attr('href', '#' + item.id).text(item.label).appendTo($button);
+    $a.attr('href', '#tabPanelItem' + i).text(item.label).appendTo($button);
     var $body = $('<div role="tabpanel" class="tab-pane">');
-    $body.attr('id', item.id).html(item.content);
+    $body.attr('id', 'tabPanelItem' + i).html(item.content);
 
     if(i == 0) {
       $button.addClass('active');
