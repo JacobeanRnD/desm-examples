@@ -7,6 +7,7 @@ head: |
     #viz { height: 300px; }
   </style>
 example: true
+layout: example
 ---
 
 <p>
@@ -16,26 +17,7 @@ example: true
     doc.akka.io/docs/akka/snapshot/common/circuitbreaker.html</a>
 </p>
 
-<div role="tabpanel">
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#statechartTab" aria-controls="home" role="tab" data-toggle="tab">statechart</a></li>
-    <li role="presentation"><a href="#scxmlTab" aria-controls="messages" role="tab" data-toggle="tab">circuit-breaker.scxml</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="statechartTab">
-      <div id="viz"></div>
-    </div>
-
-    <div role="tabpanel" class="tab-pane" id="scxmlTab">
-      <pre><code id="scxmlPreview" class="xml"></code></pre>
-    </div>
-  </div>
-</div>
-
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-<script src="//code.jquery.com/jquery-1.9.1.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.2.0/q.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/async/0.9.0/async.js"></script>
@@ -45,6 +27,19 @@ example: true
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/xml.min.js"></script>
 <script>
+$(function() {
+  E.tabPanel([
+    {
+      id: 'statechartTab',
+      label: "statechart",
+      content: '<div id="viz"></div>'
+    },
+    {
+      id: 'scxmlTab',
+      label: "circuit-breaker.scxml",
+      content: '<pre><code id="scxmlPreview" class="xml"></code></pre>'
+    }
+  ]);
   $.ajax({url: 'circuit-breaker.scxml', dataType: 'text', success: function(src) {
     hljs.highlightBlock($('#scxmlPreview').text(src)[0]);
 
@@ -55,4 +50,5 @@ example: true
     });
     layout.fit();
   }});
+});
 </script>
