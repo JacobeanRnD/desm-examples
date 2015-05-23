@@ -21,68 +21,6 @@ head: |
   </div>
 </div>
 
-<textarea id="scxmlDoc" style="display:none;">
-  <scxml
-    xmlns="http://www.w3.org/2005/07/scxml"
-    version="1.0"
-    profile="ecmascript">
-
-    <datamodel>
-      <data id="firstEvent"/>
-      <data id="eventStamp"/>
-      <data id="rectNode"/>
-      <data id="rectX"/>
-      <data id="rectY"/>
-    </datamodel>
-
-    <state id="initial-default">
-      <transition event="init" target="idle">
-        <assign location="rectNode" expr="_event.data"/>
-        <assign location="rectX" expr="0"/>
-        <assign location="rectY" expr="0"/>
-      </transition>
-    </state>
-
-    <state id="idle">
-      <onentry>
-        <script>
-          $(rectNode).text('idle');
-        </script>
-      </onentry>
-
-      <transition event="mousedown" target="dragging">
-        <assign location="firstEvent" expr="_event.data"/>
-        <assign location="eventStamp" expr="_event.data"/>
-      </transition>
-    </state>
-
-    <state id="dragging">
-      <onentry>
-        <script>
-          $(rectNode).text('dragging');
-        </script>
-      </onentry>
-
-      <transition event="mouseup" target="idle"/>
-
-      <transition event="mousemove" target="dragging">
-        <script>
-          var dx = eventStamp.clientX - _event.data.clientX;
-          var dy = eventStamp.clientY - _event.data.clientY;
-
-          //note that rectNode, rectX and rectY are all exposed
-          //from the datamodel as local variables
-
-          rectNode.style.left = (rectX -= dx) + 'px';
-          rectNode.style.top = (rectY -= dy) + 'px';
-        </script>
-        <assign location="eventStamp" expr="_event.data"/>
-      </transition>
-    </state>
-
-  </scxml>
-</textarea>
-
 <script>
   E.tabPanel([
     {
@@ -92,7 +30,7 @@ head: |
     },
     {
       id: 'scxmlTab',
-      label: "circuit-breaker.scxml",
+      label: "drag-and-drop.scxml",
       content: '<pre><code id="scxmlPreview" class="xml"></code></pre>'
     },
     {
@@ -101,9 +39,11 @@ head: |
       content: '<pre><code id="appJsPreview" class="javascript"></code></pre>'
     }
   ]);
-  hljs.highlightBlock($('#scxmlPreview').text($('#scxmlDoc').val())[0]);
   $.ajax({url: 'app.js', dataType: 'text', success: function(appjs) {
     hljs.highlightBlock($('#appJsPreview').text(appjs)[0]);
+  }});
+  $.ajax({url: 'drag-and-drop.scxml', dataType: 'text', success: function(appjs) {
+    hljs.highlightBlock($('#scxmlPreview').text(appjs)[0]);
   }});
 </script>
 <script src="//jbeard4.github.io/SCION/builds/latest/scion.js"></script>
