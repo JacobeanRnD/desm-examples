@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" name="circuit-breaker" version="1.0">
+  <datamodel>
+    <data id="queuedEvents" expr="[]"/>
+    <data id="sandbox"/>
+    <data id="DOCKER_DELAY" expr="'250ms'"/>
+    <data id="DOCKER_RESTART_DELAY" expr="'2s'"/>
+    <data id="docker"/>
+    <data id="cachedResponse"/>
+  </datamodel>
+  <script>
+    var request = require('request');
+    function sendEventToSandbox(sandbox, message){
+      var t0 = new Date();
+      request({
+        url : 'http://' + sandbox.ip + ':3000/react',
+        method : 'POST',
+        json : message
+      },function(err, response, body){
+        if(err) return this.send({name : 'docker.react.fail'});
+        console.log('received response','elapsed time',new Date() - t0, response.statusCode, body);
+        this.send({name : 'docker.react.success',data : body});
+      }.bind(this));
+    }
+  </script>
+  <transition event="error.*">
+    <log label="error" expr="_event.data.stack"/>
+  </transition>
+  <state id="initial-default">
+    <transition event="init" target="main">
+      <assign location="createSandbox" expr="_event.data.createSandbox"/>
+    </transition>
+  </state>
+  <parallel id="main">
+    <state id="sandbox-1">
+      <state id="starting-sandbox">
+        <onentry>
+          <script>
+            createSandbox(function(err, sandbox){
+              if(err) return this.send({name : 'docker.start.error'});
+              this.send({name : 'docker.start.success', data : sandbox});
+            }.bind(this));
+          </script>
+        </onentry>
+        <transition event="docker.start.success" target="closed">
+          <assign location="sandbox" expr="_event.data"/>
+        </transition>
+        <transition event="docker.start.error" target="starting-sandbox-error"/>
+      </state>
+      <state id="starting-sandbox-error"/>
+      <state id="closed">
+        <state id="closed.ready">
+          <onentry>
+            <script>
+              if(queuedEvents.length) this.send(queuedEvents.shift());
+            </script>
+          </onentry>
+          <transition event="server.react" target="closed.waiting-for-response">
+            <assign location="cachedResponse" expr="_event.data.response"/>
+            <script>
+              sendEventToSandbox.call(this, sandbox, _event.data.request.body);
+            </script>
+          </transition>
+        </state>
+        <state id="closed.waiting-for-response">
+          <onentry>
+            <send id="closed.waiting-for-response" event="docker.react.timeout" delayexpr="DOCKER_DELAY"/>
+          </onentry>
+          <onexit>
+            <cancel sendid="closed.waiting-for-response"/>
+          </onexit>
+          <transition event="server.react">
+            <script> queuedEvents.push(_event); </script>
+          </transition>
+          <transition event="docker.react.success" target="closed.ready">
+            <script> cachedResponse.status(200).send(_event.data); </script>
+          </transition>
+          <transition event="docker.react.fail" target="open">
+            <script> cachedResponse.status(500).send({name : 'sandbox.error',data : {message : _event.data.message}}); </script>
+          </transition>
+          <transition event="docker.react.timeout" target="open">
+            <script>
+              cachedResponse.status(500).send({name : 'sandbox.error.timeout'}); </script>
+          </transition>
+        </state>
+      </state>
+      <state id="open">
+        <onentry>
+          <script>
+            sandbox.container.kill(function(err){
+              if(err) return this.send({name : 'docker.restart.failure'});
+              createSandbox(function(err, sbox){
+                if(err) return this.send({name : 'docker.restart.failure'});
+                sandbox = sbox;
+                this.send({name : 'docker.restart.success'});
+              }.bind(this));
+            }.bind(this));
+          </script>
+          <!--<send id="open" event="docker.restart.timeout" delayexpr="DOCKER_RESTART_DELAY"/>-->
+        </onentry>
+        <onexit>
+          <cancel sendid="open"/>
+        </onexit>
+        <transition event="docker.restart.success" target="half-open"/>
+        <transition event="docker.restart.failure docker.restart.timeout" target="dead"/>
+      </state>
+      <state id="half-open">
+        <state id="half-open.ready">
+          <onentry>
+            <script>
+              if(queuedEvents.length) this.send(queuedEvents.shift());
+            </script>
+          </onentry>
+          <transition event="server.react" target="half-open.waiting-for-response">
+            <assign location="cachedResponse" expr="_event.data.response"/>
+            <script> sendEventToSandbox.call(this, sandbox, _event.data.request.body); </script>
+          </transition>
+        </state>
+        <state id="half-open.waiting-for-response">
+          <onentry>
+            <send id="half-open.waiting-for-response" event="docker.react.timeout" delayexpr="DOCKER_DELAY"/>
+          </onentry>
+          <onexit>
+            <cancel sendid="half-open.waiting-for-response"/>
+          </onexit>
+          <transition event="docker.react.success" target="closed">
+            <script> cachedResponse.status(200).send(_event.data); </script>
+          </transition>
+          <transition event="docker.react.fail" target="dead">
+            <script> console.log('docker.react.fail'); cachedResponse.status(500).send({name : 'sandbox.error',data : {message : _event.data.message}}); </script>
+          </transition>
+          <transition event="docker.react.timeout" target="dead">
+            <script> console.log('docker.react.timeout'); cachedResponse.status(500).send({name : 'sandbox.error.timeout'}); </script>
+          </transition>
+        </state>
+      </state>
+      <state id="dead">
+        <transition target="starting-sandbox"/>
+      </state>
+      <transition target="shutting-down" event="process.sigint"/>
+      <state id="shutting-down">
+        <onentry>
+          <script>
+            sandbox.container.stop(function(){
+              console.log('Container stopped');
+              sandbox.container.remove(function(){
+                console.log('Container removed');
+                this.send({name:'container.removed'});
+              }.bind(this));
+            }.bind(this));
+          </script>
+        </onentry>
+        <transition event="container.removed" target="done"/>
+      </state>
+      <final id="done"/>
+    </state>
+    <transition event="server.react">
+      <script>
+        //by default, fail the event
+        _event.data.response.status(500).send({name:"error.sandbox.open",data : { message : "Circuit breaker open. Restarting sandbox."}});
+      </script>
+    </transition>
+    <transition target="exiting" cond="In('done')"/>
+  </parallel>
+  <state id="exiting">
+    <onentry>
+      <script>
+        process.exit();
+      </script>
+    </onentry>
+  </state>
+</scxml>
