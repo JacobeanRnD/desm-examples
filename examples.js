@@ -26,7 +26,16 @@ E.tabPanel = function(items) {
 };
 
 E.get = function(url, callback) {
-  $.ajax({url: url, dataType: 'text', success: callback});
+  return Q($.ajax({url: url, dataType: 'text', success: callback}));
 };
+
+E.code = function(src, language) {
+  var $code = $('<code>').attr('class', language);
+  src.then(function(text) {
+    $code.text(text);
+    hljs.highlightBlock($code[0]);
+  });
+  return $('<pre>').append($code);
+}
 
 })();

@@ -50,6 +50,11 @@ head: |
 <script src="jquery.svgdom.js"></script>
 <script src="go.js"></script>
 <script>
+  var src = {
+    'behaviour/canvas.js': E.get('behaviour/canvas.js'),
+    'behaviour/canvas.xml': E.get('behaviour/canvas.xml'),
+    'go.js': E.get('go.js')
+  };
   E.tabPanel([
     {
       id: 'statechartTab',
@@ -59,26 +64,17 @@ head: |
     {
       id: 'canvasXmlTab',
       label: "canvas.xml",
-      content: '<pre><code id="canvasXmlPreview" class="xml"></code></pre>'
+      content: E.code(src['behaviour/canvas.xml'])
     },
     {
       id: 'canvasJsTab',
-      label: "canvas.xml",
-      content: '<pre><code id="canvasJsPreview" class="javascript"></code></pre>'
+      label: "canvas.js",
+      content: E.code(src['behaviour/canvas.js'])
     },
     {
       id: 'goJsTab',
       label: "go.js",
-      content: '<pre><code id="goJsPreview" class="javascript"></code></pre>'
+      content: E.code(src['go.js'])
     }
   ]);
-  E.get('behaviour/canvas.js', function(appjs) {
-    hljs.highlightBlock($('#canvasJsPreview').text(appjs)[0]);
-  });
-  E.get('behaviour/canvas.xml', function(appjs) {
-    hljs.highlightBlock($('#canvasXmlPreview').text(appjs)[0]);
-  });
-  E.get('go.js', function(appjs) {
-    hljs.highlightBlock($('#goJsPreview').text(appjs)[0]);
-  });
 </script>

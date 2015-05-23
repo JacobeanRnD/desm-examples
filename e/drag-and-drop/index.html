@@ -22,6 +22,10 @@ head: |
 </div>
 
 <script>
+  var src = {
+    'app.js': E.get('app.js'),
+    'drag-and-drop.scxml': E.get('drag-and-drop.scxml')
+  };
   E.tabPanel([
     {
       id: 'statechartTab',
@@ -31,20 +35,14 @@ head: |
     {
       id: 'scxmlTab',
       label: "drag-and-drop.scxml",
-      content: '<pre><code id="scxmlPreview" class="xml"></code></pre>'
+      content: E.code(src['drag-and-drop.scxml'])
     },
     {
       id: 'appJsTab',
       label: "app.js",
-      content: '<pre><code id="appJsPreview" class="javascript"></code></pre>'
+      content: E.code(src['app.js'])
     }
   ]);
-  E.get('app.js', function(appjs) {
-    hljs.highlightBlock($('#appJsPreview').text(appjs)[0]);
-  });
-  E.get('drag-and-drop.scxml', function(appjs) {
-    hljs.highlightBlock($('#scxmlPreview').text(appjs)[0]);
-  });
 </script>
 <script src="//jbeard4.github.io/SCION/builds/latest/scion.js"></script>
 <script src="app.js"></script>

@@ -13,6 +13,9 @@ head: |
 </p>
 
 <script>
+  var src = {
+    'managing-director.scxml': E.get('managing-director.scxml')
+  };
   E.tabPanel([
     {
       id: 'statechartTab',
@@ -22,12 +25,10 @@ head: |
     {
       id: 'scxmlTab',
       label: "managing-director.scxml",
-      content: '<pre><code id="scxmlPreview" class="xml"></code></pre>'
+      content: E.code(src['managing-director.scxml'])
     }
   ]);
-  E.get('managing-director.scxml', function(src) {
-    hljs.highlightBlock($('#scxmlPreview').text(src)[0]);
-
+  src['managing-director.scxml'].then(function(src) {
     var scxmlDoc = (new DOMParser()).parseFromString(src, "application/xml");
     var layout = new forceLayout.Layout({
       parent: document.getElementById('viz'),

@@ -14,6 +14,9 @@ head: |
 </p>
 
 <script>
+  var src = {
+    'circuit-breaker.scxml': E.get('circuit-breaker.scxml')
+  };
   E.tabPanel([
     {
       id: 'statechartTab',
@@ -23,12 +26,10 @@ head: |
     {
       id: 'scxmlTab',
       label: "circuit-breaker.scxml",
-      content: '<pre><code id="scxmlPreview" class="xml"></code></pre>'
+      content: E.code(src['circuit-breaker.scxml'])
     }
   ]);
-  E.get('circuit-breaker.scxml', function(src) {
-    hljs.highlightBlock($('#scxmlPreview').text(src)[0]);
-
+  src['circuit-breaker.scxml'].then(function(src) {
     var scxmlDoc = (new DOMParser()).parseFromString(src, "application/xml");
     var layout = new forceLayout.Layout({
       parent: document.getElementById('viz'),
