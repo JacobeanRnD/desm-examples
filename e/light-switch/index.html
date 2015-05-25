@@ -1,0 +1,27 @@
+---
+title: Light Switch
+---
+
+<script>
+  var src = {
+    'light-switch.scxml': E.get('light-switch.scxml')
+  };
+  E.tabPanel([
+    {
+      label: "statechart",
+      content: '<div id="viz"></div>'
+    },
+    {
+      label: "light-switch.scxml",
+      content: E.code(src['light-switch.scxml'])
+    }
+  ]);
+  src['light-switch.scxml'].then(function(src) {
+    var scxmlDoc = (new DOMParser()).parseFromString(src, "application/xml");
+    var layout = new forceLayout.Layout({
+      parent: document.getElementById('viz'),
+      doc: scxmlDoc
+    });
+    layout.fit();
+  });
+</script>

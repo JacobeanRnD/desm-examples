@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml
+    xmlns="http://www.w3.org/2005/07/scxml"
+    name="light-switch"
+    datamodel="ecmascript"
+    version="1.0">
+  <state id="OK">
+    <state id="on">
+      <transition target="off"
+          event="device.turnOff"/>
+    </state>
+    <state id="off">
+      <transition target="on"
+        event="device.turnOn"/>
+    </state>
+    <transition target="error"
+        event="device.error"/>
+  </state>
+  <state id="error">
+    <transition target="OK"
+        event="device.reset"/>
+  </state>
+</scxml>
