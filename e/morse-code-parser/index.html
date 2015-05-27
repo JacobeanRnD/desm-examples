@@ -21,7 +21,7 @@ head: |
 <script>
   var src = {
     'morse.scxml': E.get('morse.scxml'),
-    'app.js': E.get('app.js'),
+    'app.jsx': E.get('app.jsx'),
     'main.js': E.get('main.js'),
     'run.sh': E.get('run.sh')
   };
@@ -35,8 +35,8 @@ head: |
       content: E.code(src['morse.scxml'])
     },
     {
-      label: "app.js",
-      content: E.code(src['app.js'])
+      label: "app.jsx",
+      content: E.code(src['app.jsx'])
     },
     {
       label: "main.js",
@@ -49,4 +49,6 @@ head: |
   ]);
 </script>
 <script src="//jbeard4.github.io/SCION/builds/latest/scion.js"></script>
-<script src="app.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+<script type="text/jsx" src="app.jsx"></script>
