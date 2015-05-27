@@ -3,6 +3,7 @@ title: Morse Code Parser
 head: |
   <style>
     #viz { height: 600px; }
+    #button { width: 50px; height: 50px; background: #aaa; }
   </style>
 ---
 
@@ -11,9 +12,16 @@ head: |
     github.com/jbeard4/scxml-morse-code-parser</a>
 </p>
 
+<div class="well" id="canvas-container">
+  <div id="canvas">
+    <div id="button"></div>
+  </div>
+</div>
+
 <script>
   var src = {
     'morse.scxml': E.get('morse.scxml'),
+    'app.js': E.get('app.js'),
     'main.js': E.get('main.js'),
     'run.sh': E.get('run.sh')
   };
@@ -27,6 +35,10 @@ head: |
       content: E.code(src['morse.scxml'])
     },
     {
+      label: "app.js",
+      content: E.code(src['app.js'])
+    },
+    {
       label: "main.js",
       content: E.code(src['main.js'])
     },
@@ -35,12 +47,6 @@ head: |
       content: E.code(src['run.sh'])
     }
   ]);
-  src['morse.scxml'].then(function(src) {
-    var scxmlDoc = (new DOMParser()).parseFromString(src, "application/xml");
-    var layout = new forceLayout.Layout({
-      parent: document.getElementById('viz'),
-      doc: scxmlDoc
-    });
-    layout.fit();
-  });
 </script>
+<script src="//jbeard4.github.io/SCION/builds/latest/scion.js"></script>
+<script src="app.js"></script>
