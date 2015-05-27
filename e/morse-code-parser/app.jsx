@@ -26,6 +26,13 @@ class StateView extends React.Component {
 }
 
 
+class OutputView extends React.Component {
+  render() {
+    return <span>{this.state && this.state.log}</span>;
+  }
+}
+
+
 $.get('morse.scxml', function(scxml) {
   var rect = document.getElementById("rect");
   var scxmlDoc = (new DOMParser()).parseFromString(scxml, "application/xml");
@@ -43,6 +50,13 @@ $.get('morse.scxml', function(scxml) {
     var interpreter = new scion.SCXML(model);
 
     var stateView = React.render(<StateView />, document.getElementById('button'));
+    var outputView = React.render(<OutputView />, document.getElementById('output'));
+
+    var log = [];
+    var output = function(value) {
+      log.push(value);
+      outputView.setState({log: log});
+    };
 
     interpreter.registerListener({
       onEntry: function(stateId) {
@@ -50,6 +64,8 @@ $.get('morse.scxml', function(scxml) {
         newState[stateId] = true;
         stateView.setState(newState);
         layout.highlightState(stateId, true);
+        if(stateId == 'dot') { output('•'); }
+        if(stateId == 'dash') { output('-'); }
       },
       onExit: function(stateId) {
         var newState = {};
